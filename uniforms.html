@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Workflow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group button {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #2980b9;
+        }
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+        }
+        .error {
+            border-left: 4px solid #e74c3c;
+            background-color: #f9e6e6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Quick Uniform </h1>
+    </header>
+    <div class="container">
+        <h2>HR Digital Onboarding</h2>
+        <form id="workflowForm">
+            <div class="form-group">
+                <label for="employeeName">Employee Name:</label>
+                <input type="text" id="employeeName" placeholder="Enter employee name" required>
+            </div>
+            <div class="form-group">
+                <label for="employeePosition">Employee Position:</label>
+                <input type="text" id="employeePosition" placeholder="Enter employee position" required>
+            </div>
+            <div class="form-group">
+                <label for="clothingSize">Clothing Size:</label>
+                <select id="clothingSize" required>
+                    <option value="">Select size</option>
+                    <option value="S">Small</option>
+                    <option value="M">Medium</option>
+                    <option value="L">Large</option>
+                    <option value="XL">Extra Large</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="analyze()">Analyze</button>
+            </div>
+        </form>
+        <div id="status" class="status" style="display: none;">
+            <p id="statusMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        function analyze() {
+            const employeeName = document.getElementById('employeeName').value;
+            const employeePosition = document.getElementById('employeePosition').value;
+            const clothingSize = document.getElementById('clothingSize').value;
+
+            if (!employeeName || !employeePosition || !clothingSize) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            // Simulate workflow automation
+            const statusDiv = document.getElementById('status');
+            const statusMessage = document.getElementById('statusMessage');
+
+            statusDiv.style.display = 'block';
+            statusDiv.classList.remove('error');
+            statusMessage.textContent = `Processing workflow for ${employeeName} (${employeePosition})...`;
+
+            setTimeout(() => {
+                // Simulate clothing size availability
+                const sizeAvailable = Math.random() > 0.5; // 50% chance of size being available
+                if (!sizeAvailable) {
+                    handleSizeUnavailable();
+                    return;
+                }
+
+                // If size is available
+                statusMessage.textContent = 'Clothing inventory checked. Size is available. Order placed successfully!';
+            }, 2000);
+        }
+
+        function handleSizeUnavailable() {
+            const statusDiv = document.getElementById('status');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Simulate company resources availability
+            const resourcesAvailable = Math.random() > 0.5; // 50% chance of resources being available
+            if (resourcesAvailable) {
+                statusMessage.textContent = 'Size not available. The company has the budget. The product will arrive in 3 days.';
+            } else {
+                statusMessage.textContent = 'Size not available. Budget request sent to accounting. The budget will be approved in 3 days, and the product will arrive 3 days after that.';
+                const continueButton = document.createElement('button');
+                continueButton.textContent = 'Accept and Continue';
+                continueButton.style.marginTop = '1rem';
+                continueButton.onclick = () => {
+                    statusMessage.textContent = 'Budget approved by accounting. Order placed successfully! The product will arrive in 3 days.';
+                    continueButton.remove();
+                };
+                statusDiv.appendChild(continueButton);
+            }
+        }
+    </script>
+</body>
+</html>
