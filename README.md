@@ -44,12 +44,12 @@ Human Resources challenges in inventory and supplier management
 
 RPA and AI recommendations for future improvements
 
-Editar
 UniformManagement/
 ├── uniforms.html           # Main simulator
 ├── The Importance of...docx  # Academic report
 ├── README.md               # Project overview
 🚀 How to Use
+
 Open the simulator (uniforms.html) in your browser or visit the GitHub Pages link.
 
 Enter an employee's name, position, and size.
