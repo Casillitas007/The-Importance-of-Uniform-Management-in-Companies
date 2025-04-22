@@ -1,0 +1,23 @@
+
+PURCHASE ORDER: PO-1745335031817
+Date: 4/22/2025
+To: Uniform Supplier Inc.
+
+URGENT: Low Stock Replenishment Request
+----------------------------------------
+
+Item Details:
+- Uniform Size: XL
+- Quantity: 5 units
+- Unit Price: $40.00
+- Total: $200.00
+
+Delivery Address:
+Company Warehouse, 123 Business St.
+
+Contact Information:
+HR Department
+hr@company.com
+
+Priority: High Priority - Low Stock
+            

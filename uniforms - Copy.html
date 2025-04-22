@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Workflow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group button {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #2980b9;
+        }
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+        }
+        .error {
+            border-left: 4px solid #e74c3c;
+            background-color: #f9e6e6;
+        }
+        .flow-diagram {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #fff;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+        }
+        .step {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .dashboard-item {
+            padding: 1rem;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Quick Uniform Simulator</h1>
+        <p>Automated BPM Workflow</p>
+    </header>
+    <div class="container">
+        <h2>HR Digital Onboarding</h2>
+        <form id="workflowForm">
+            <div class="form-group">
+                <label for="employeeName">Employee Name:</label>
+                <select id="employeeName" required onchange="updateEmployeeInfo()">
+                    <option value="">Select employee</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="employeePosition">Employee Position:</label>
+                <input type="text" id="employeePosition" readonly>
+            </div>
+            <div class="form-group">
+                <label for="clothingSize">Clothing Size:</label>
+                <input type="text" id="clothingSize" readonly>
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="analyze()">Analyze</button>
+            </div>
+        </form>
+
+        <!-- Add BPM Flow Diagram -->
+        <div class="flow-diagram">
+            <h3>Automated Process (BPM)</h3>
+            <div id="stepsContainer"></div>
+        </div>
+
+        <!-- Add Simulation Dashboard -->
+        <div class="dashboard">
+            <div class="dashboard-item">
+                <h4>📦 Simulated Inventory</h4>
+                <p id="inventoryStatus">Loading...</p>
+            </div>
+            <div class="dashboard-item">
+                <h4>💰 HR Budget</h4>
+                <p id="budgetStatus">Loading...</p>
+            </div>
+        </div>
+
+        <div id="status" class="status" style="display: none;">
+            <p id="statusMessage"></p>
+        </div>
+
+        <!-- Add Delivery History Table -->
+        <div class="delivery-list">
+            <h3>Uniform Delivery History</h3>
+            <table class="history-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th style="background: #3498db; color: white; padding: 8px; text-align: left;">Employee</th>
+                        <th style="background: #3498db; color: white; padding: 8px; text-align: left;">Position</th>
+                        <th style="background: #3498db; color: white; padding: 8px; text-align: left;">Size</th>
+                        <th style="background: #3498db; color: white; padding: 8px; text-align: left;">Delivery Date</th>
+                    </tr>
+                </thead>
+                <tbody id="deliveryHistory"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let employeeData = null;
+        let simulatedInventory = {};
+        let hrBudget = 0;
+        let bpmSteps = [];
+        
+        async function initializeSystem() {
+            try {
+                const response = await fetch('employees.json');
+                if (!response.ok) throw new Error('Failed to load employee data');
+                
+                employeeData = await response.json();
+                
+                // Initialize system with JSON data
+                simulatedInventory = employeeData.simulatedInventory;
+                hrBudget = employeeData.hrBudget;
+                bpmSteps = employeeData.bpmSteps;
+                
+                // Populate employee dropdown with English labels
+                const employeeSelect = document.getElementById('employeeName');
+                employeeSelect.innerHTML = `
+                    <option value="">Select employee</option>
+                    ${employeeData.deliveryHistory.map(emp => `
+                        <option value="${emp.name}" 
+                                data-position="${emp.position}"
+                                data-size="${emp.size}">
+                            ${emp.name}
+                        </option>
+                    `).join('')}
+                `;
+                
+                updateDashboard();
+                displaySteps();
+                updateDeliveryHistory(); // Add this line to show initial history
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('status').innerHTML = '❌ Error loading employee data';
+            }
+        }
+
+        function updateEmployeeInfo() {
+            const selectedOption = document.getElementById('employeeName').selectedOptions[0];
+            if (selectedOption && selectedOption.value) {
+                document.getElementById('employeePosition').value = selectedOption.dataset.position;
+                document.getElementById('clothingSize').value = selectedOption.dataset.size;
+            }
+        }
+
+        function analyze() {
+            const employeeName = document.getElementById('employeeName').value;
+            const employeePosition = document.getElementById('employeePosition').value;
+            const size = document.getElementById('clothingSize').value;
+
+            if (!employeeName) {
+                alert('Please select an employee.');
+                return;
+            }
+
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'block';
+            let statusHTML = "";
+
+            // Check inventory
+            if(simulatedInventory[size] > 0) {
+                simulatedInventory[size]--;
+                statusHTML = `✅ Uniform delivered successfully (Size ${size})`;
+                
+                // Add to delivery history
+                const delivery = {
+                    name: employeeName,
+                    position: employeePosition,
+                    size: size,
+                    date: new Date().toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    })
+                };
+                employeeData.deliveryHistory.push(delivery);
+                updateDeliveryHistory();
+            } else {
+                statusHTML = `⚠️ Size ${size} out of stock. ${simulateSupplierOrder(size)}`;
+            }
+
+            statusDiv.innerHTML = statusHTML;
+            updateDashboard();
+            displaySteps();
+        }
+
+        function updateDeliveryHistory() {
+            const historyTable = document.getElementById('deliveryHistory');
+            historyTable.innerHTML = employeeData.deliveryHistory.map(delivery => `
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">${delivery.name}</td>
+                    <td style="padding: 8px;">${delivery.position}</td>
+                    <td style="padding: 8px;">${delivery.size}</td>
+                    <td style="padding: 8px;">${delivery.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function displaySteps() {
+            const container = document.getElementById('stepsContainer');
+            container.innerHTML = bpmSteps.map(step => 
+                `<div class="step">${step}</div>`
+            ).join('');
+        }
+
+        function updateDashboard() {
+            document.getElementById('inventoryStatus').innerHTML = 
+                `Current Inventory:<br>${JSON.stringify(simulatedInventory, null, 2).replace(/[{}"]/g, '')}`;
+            document.getElementById('budgetStatus').innerHTML = 
+                `Available Budget: $${hrBudget}`;
+        }
+
+        function simulateSupplierOrder(size) {
+            // Check if budget will go below 0
+            if (hrBudget - 200 < 0) {
+                requestAccountingBudget();
+                return "🔄 Waiting for budget approval...";
+            }
+
+            setTimeout(() => {
+                simulatedInventory[size] = (simulatedInventory[size] || 0) + 5;
+                hrBudget -= 200;
+                updateDashboard();
+            }, 3000);
+            return "Order placed with supplier. Expected delivery: 3 business days ⏳";
+        }
+
+        function requestAccountingBudget() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML += "<br>📤 Budget request sent to accounting department...";
+            
+            setTimeout(() => {
+                hrBudget += 600;
+                statusDiv.innerHTML += "<br>✅ Additional budget of $600 approved!";
+                updateDashboard();
+            }, 3000);
+        }
+
+        // Initialize system on page load
+        document.addEventListener('DOMContentLoaded', initializeSystem);
+
+    </script>
+</body>
+</html>

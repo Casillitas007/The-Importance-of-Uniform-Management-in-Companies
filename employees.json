@@ -1,0 +1,43 @@
+{
+  "simulatedInventory": {
+    "S": 8,
+    "M": 12,
+    "L": 5,
+    "XL": 2
+  },
+  "hrBudget": 1500,
+  "bpmSteps": [
+    "1. Digital Employee Registration",
+    "2. Position Requirements Validation",
+    "3. Real-time Inventory Check",
+    "4. Automatic Budget Validation",
+    "5. Supplier Order Management",
+    "6. Employee Delivery"
+  ],
+  "deliveryHistory": [
+    {
+      "name": "Ana Pérez",
+      "position": "MANAGER",
+      "size": "L",
+      "date": "10/05/2024"
+    },
+    {
+      "name": "JUAN ALEJANDRO",
+      "position": "SENIOR",
+      "size": "M",
+      "date": "10/05/2024"
+    },
+    {
+      "name": "MONIKA",
+      "position": "KITCHEN PORTER",
+      "size": "S",
+      "date": "10/05/2024"
+    },
+    {
+      "name": "ALEXIS",
+      "position": "DIRECTIVE",
+      "size": "XL",
+      "date": "10/05/2024"
+    }
+   ]
+}
